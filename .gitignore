@@ -1,0 +1,16 @@
+# Python bytecode / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+env/
+venv/
+ENV/
+
+# Streamlit config/cache
+.streamlit/
+
+# IDE files
+.vscode/
+.idea/
