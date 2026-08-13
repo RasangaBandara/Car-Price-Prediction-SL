@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 import streamlit as st
 
-# --- Page Configuration ---
+
 st.set_page_config(
     page_title='Used Car Price Predictor (SL Market Sync)', page_icon='🚗', layout='centered'
 )
@@ -13,7 +13,7 @@ st.subheader('Sri Lankan Market Context-Aware Model')
 st.markdown('Input the vehicle specifications below to estimate its market value.')
 st.markdown('---')
 
-# --- Load Data & Train Model (Cached for Performance) ---
+
 @st.cache_data
 def load_and_train_model():
     df = pd.read_csv('car_price_dataset.csv')
@@ -24,17 +24,15 @@ def load_and_train_model():
     df_clean['Model'] = df_clean['Model'].astype(str).str.upper().str.strip()
     df_clean['Town'] = df_clean['Town'].astype(str).str.upper().str.strip()
     
-    # -----------------------------------------------------------------
-    # DATA SCIENCE FIX 1: OUTLIER REMOVAL (ඉතා ඉහළ සහ ඉතා අඩු වැරදි මිල ගණන් ඉවත් කිරීම)
-    # Removing extreme anomalies that distort the Random Forest learning process
+   
     q_low = df_clean["Price"].quantile(0.01)
     q_hi  = df_clean["Price"].quantile(0.99)
     df_clean = df_clean[(df_clean["Price"] < q_hi) & (df_clean["Price"] > q_low)]
-    # -----------------------------------------------------------------
+  
 
     dataset_max_year = int(df_clean['YOM'].max())
 
-    # Clean binary flags
+   
     bool_cols = ['AIR CONDITION', 'POWER STEERING', 'POWER MIRROR', 'POWER WINDOW']
     for col in bool_cols:
         if col in df_clean.columns:
@@ -45,12 +43,12 @@ def load_and_train_model():
     if 'Condition' in df_clean.columns:
         df_clean['Condition'] = (df_clean['Condition'] == 'USED').astype(int)
 
-    # Core Domain Features
+   
     df_clean['Car_Age'] = dataset_max_year - df_clean['YOM']
     df_clean['Mileage_Per_Year'] = df_clean['Millage(KM)'] / (df_clean['Car_Age'] + 1)
     df_clean['Is_Import_Ban_Period'] = (df_clean['YOM'] >= 2020).astype(int)
 
-    # High-Fidelity Target Encoding
+  
     brand_target_map = df_clean.groupby('Brand')['Price'].mean().to_dict()
     model_target_map = df_clean.groupby('Model')['Price'].mean().to_dict()
     town_target_map = df_clean.groupby('Town')['Price'].mean().to_dict()
@@ -59,7 +57,7 @@ def load_and_train_model():
     df_clean['Model_encoded'] = df_clean['Model'].map(model_target_map)
     df_clean['Town_encoded'] = df_clean['Town'].map(town_target_map)
 
-    # Max price boundary tracking per model to enforce hard caps later
+    
     model_max_market_cap = df_clean.groupby('Model')['Price'].max().to_dict()
 
     unique_brands = sorted(df_clean['Brand'].unique().tolist())
@@ -77,10 +75,10 @@ def load_and_train_model():
 
     return model, X.columns, brand_target_map, model_target_map, town_target_map, unique_brands, unique_towns, raw_brand_model_df, dataset_max_year, model_max_market_cap
 
-# Initialize configurations
+
 model, feature_columns, brand_map, model_map, town_map, brands, towns, brand_model_df, max_year, max_caps = load_and_train_model()
 
-# --- UI Input Form Layout ---
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -105,7 +103,7 @@ ps = c2.checkbox('Power Steering', value=True)
 pm = c3.checkbox('Power Mirrors', value=True)
 pw = c4.checkbox('Power Windows', value=True)
 
-# --- Inference and Output ---
+
 st.markdown('---')
 if st.button('Estimate Market Price', type='primary'):
     car_age = max_year - selected_yom
@@ -120,7 +118,7 @@ if st.button('Estimate Market Price', type='primary'):
     m_val = float(model_map.get(m_lookup, np.median(list(model_map.values()))))
     t_val = float(town_map.get(t_lookup, np.median(list(town_map.values()))))
 
-    # Compile dynamic input vector
+    
     input_row = pd.DataFrame(0.0, index=[0], columns=feature_columns)
     input_row.loc[0, 'YOM'] = float(selected_yom)
     input_row.loc[0, 'Engine (cc)'] = float(selected_engine)
@@ -148,22 +146,20 @@ if st.button('Estimate Market Price', type='primary'):
     elif selected_fuel == 'Hybrid' and 'Fuel Type_Hybrid' in feature_columns:
         input_row.loc[0, 'Fuel Type_Hybrid'] = 1.0
 
-    # Base Model Prediction
+    
     prediction = model.predict(input_row)[0]
 
-    # -----------------------------------------------------------------
-    # DATA SCIENCE FIX 2: MARKET CALIBRATION CAPS (මිල අසාමාන්‍ය ලෙස ඉහළ යාම වැළැක්වීම)
-    # Applying realistic mileage based depreciation caps to align with Ikman.lk realities
+   
     model_max = max_caps.get(m_lookup, prediction)
     
-    # 1. High Mileage Depreciation Penalty
+    
     if selected_mileage > 120000:
         prediction *= 0.92  # 8% drop for high wear and tear
         
-    # 2. Hard Ceiling Check: Make sure it doesn't absurdly overshoot the general vehicle class cap
+
     if prediction > model_max:
         prediction = model_max * 0.95
-    # -----------------------------------------------------------------
+    
 
     st.success('Prediction Successful!')
     st.metric(
