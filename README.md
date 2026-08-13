@@ -1,6 +1,13 @@
 # 🚗 Sri Lankan Used Car Price Prediction System
 
-An end-to-end Machine Learning web application built with **Streamlit** and **Random Forest Regressor** to estimate used car market prices in Sri Lanka. The model accounts for economic market shifts, high-mileage depreciation curves, and outlier sanitization.
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://rasangabandara-car-price-prediction-sl.streamlit.app/)
+![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-Random%20Forest-orange.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+
+An end-to-end Machine Learning web application built with **Streamlit** and a calibrated **Random Forest Regressor** to estimate secondary automobile market prices in Sri Lanka. The model accounts for local market realities, high-mileage wear curves, import ban distortions, and outlier sanitization.
+
+🔗 **Live Web Application:** [rasangabandara-car-price-prediction-sl.streamlit.app](https://rasangabandara-car-price-prediction-sl.streamlit.app/)
 
 ---
 
@@ -23,9 +30,13 @@ This project implements an intelligent prediction pipeline featuring:
 
 ---
 
-## 🚀 How to Run Locally
+## 📁 Repository Structure
 
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/YOUR_GITHUB_USERNAME/Car-Price-Prediction-SL.git](https://github.com/YOUR_GITHUB_USERNAME/Car-Price-Prediction-SL.git)
-cd Car-Price-Prediction-SL
+```text
+Car-Price-Prediction-SL/
+│
+├── car_price_dataset.csv      # Primary vehicle dataset
+├── web_app.py                 # Main Streamlit web application
+├── requirements.txt           # Python dependency manifest
+├── .gitignore                 # Git ignore configuration
+└── README.md                  # Project documentation
