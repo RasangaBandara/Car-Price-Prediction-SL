@@ -1,11 +1,11 @@
 # Group Members
-* Rasanga Bandara  - ITBIN-2312-0002
+* Rasanga Bandara    - ITBIN-2312-0002
 
 * Mindula Deenamulla - ITBNM-2313-0074
 
-* Dilki Ishari - ITBIN-2312-0009
+* Dilki Ishari       - ITBIN-2312-0009
 
-* Mandulee Laknara - ITBIN-2312-0018
+* Mandulee Laknara   - ITBIN-2312-0018
 
 # 🚗 Sri Lankan Used Car Price Prediction System
 
